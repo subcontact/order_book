@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { COLOR } from "../../constants";
+import { COLOR } from "../../../constants";
 
-export default function BookItem({ type, price, amount, maxAmount }) {
+export function BookItem({ type, price, amount, maxAmount }) {
   return (
     <View style={styles.outerContainer}>
       <View

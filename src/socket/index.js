@@ -3,15 +3,22 @@ import { updateChannelId, updatePrice } from "../redux/book/actions";
 
 let connectStatus = "idle"; // idle | connecting | connected
 
+let currentPrecision = 0;
 let bids = {};
 let asks = {};
+let wss = null;
 
-export function connectSocket() {
+export function connectSocket(precision) {
+  if (precision !== currentPrecision) {
+    wss.close();
+    connectStatus = "idle";
+  }
+
   if (connectStatus !== "idle") return;
 
   connectStatus = "connecting";
 
-  const wss = new WebSocket("wss://api-pub.bitfinex.com/ws/2");
+  wss = new WebSocket("wss://api-pub.bitfinex.com/ws/2");
 
   wss.onopen = () => {
     connectStatus = "connected";
@@ -20,6 +27,7 @@ export function connectSocket() {
       event: "subscribe",
       channel: "book",
       symbol: "tBTCUSD",
+      prec: `P${Math.min(precision, 4)}`,
     });
     wss.send(subscribeMessage);
   };
