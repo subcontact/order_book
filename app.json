@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "order_book",
+    "slug": "order_book",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
