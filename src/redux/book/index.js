@@ -1,9 +1,9 @@
-import { UPDATE_CHANNEL_ID, UPDATE_INITIAL_PRICE } from "./actionType";
+import { UPDATE_CHANNEL_ID, UPDATE_PRICE } from "./actionType";
 
 const initialState = {
   channelId: 0,
-  bids: {}, // price as id
-  asks: {}, // price as id
+  bids: [],
+  asks: [],
 };
 
 const bookReducer = (state = initialState, action) => {
@@ -13,7 +13,7 @@ const bookReducer = (state = initialState, action) => {
         ...state,
         channelId: action.payload,
       };
-    case UPDATE_INITIAL_PRICE:
+    case UPDATE_PRICE: {
       const {
         channelId,
         prices: { bids, asks },
@@ -26,6 +26,7 @@ const bookReducer = (state = initialState, action) => {
         bids,
         asks,
       };
+    }
     default:
       return state;
   }
