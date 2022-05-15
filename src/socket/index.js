@@ -1,27 +1,31 @@
+import NetInfo from "@react-native-community/netinfo";
+
 import store from "../redux";
 import { updateChannelId, updatePrice } from "../redux/book/actions";
+import { CONNECT_STATUS } from "./constants";
+import { transformAsksPriceData, transformBidsPriceData } from "./utils";
 
-let connectStatus = "idle"; // idle | connecting | connected
+let connectStatus = CONNECT_STATUS.IDLE;
 
 let currentPrecision = 0;
 let bids = {};
 let asks = {};
 let wss = null;
 
-export function connectSocket(precision) {
+export function connectSocket(precision = currentPrecision) {
   if (precision !== currentPrecision) {
-    wss.close();
-    connectStatus = "idle";
+    currentPrecision = precision;
+    closeSocket();
   }
 
-  if (connectStatus !== "idle") return;
+  if (connectStatus !== CONNECT_STATUS.IDLE) return;
 
-  connectStatus = "connecting";
+  connectStatus = CONNECT_STATUS.CONNECTING;
 
   wss = new WebSocket("wss://api-pub.bitfinex.com/ws/2");
 
   wss.onopen = () => {
-    connectStatus = "connected";
+    connectStatus = CONNECT_STATUS.CONNECTED;
 
     let subscribeMessage = JSON.stringify({
       event: "subscribe",
@@ -94,16 +98,17 @@ export function connectSocket(precision) {
       );
     } catch {}
   };
+
+  NetInfo.addEventListener((state) => {
+    if (!state.isConnected) {
+      closeSocket();
+    } else {
+      connectSocket(currentPrecision);
+    }
+  });
 }
 
-const transformAsksPriceData = (obj) =>
-  Object.entries(obj)
-    .map(([price, amount]) => ({
-      price,
-      amount: amount.toFixed(2),
-    }))
-    .filter(({ amount }) => amount > 0)
-    .slice(0, 15);
-
-const transformBidsPriceData = (obj) =>
-  transformAsksPriceData(obj).sort((a, b) => b.price - a.price);
+export const closeSocket = () => {
+  wss.close();
+  connectStatus = CONNECT_STATUS.IDLE;
+};

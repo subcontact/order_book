@@ -53,7 +53,6 @@ export default function OrderBook() {
 
 const styles = StyleSheet.create({
   outerContainer: {
-    flex: 1,
     justifyContent: "center",
   },
   innerContainer: {
